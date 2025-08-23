@@ -10,7 +10,7 @@ builder.Services.AddOpenApi();
 
 #region Application Services
 
-builder.Services.AddTransient<ITasksRepo, TasksRepo>();
+builder.Services.AddSingleton<ITasksRepo, TasksRepo>();
 
 #endregion
 

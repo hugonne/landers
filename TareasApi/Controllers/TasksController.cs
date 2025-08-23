@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using TareasApi.Domain;
 using TareasApi.Repos;
 
 namespace TareasApi.Controllers;
@@ -20,27 +21,60 @@ public class TasksController : ControllerBase
         return Ok(_tasksRepo.GetTasks());
     }
     
-    [HttpGet("{id:int}")]
-    public IActionResult GetById(int id)
+    [HttpGet("{id:guid}")]
+    public IActionResult GetById(Guid id)
     {
-        return Ok("One: " + id);
+        var allTasks = _tasksRepo.GetTasks();
+        var oneTask = allTasks.FirstOrDefault(t => t.Id == id);
+        
+        if (oneTask == null)
+        {
+            return NotFound();
+        }
+        
+        return Ok(oneTask);
     }
     
-    [HttpDelete]
-    public IActionResult Delete()
+    [HttpDelete("{id:guid}")]
+    public IActionResult Delete(Guid id)
     {
+        var allTasks = _tasksRepo.GetTasks();
+        var oneTask = allTasks.FirstOrDefault(t => t.Id == id);
+
+        if (oneTask == null)
+        {
+            return NotFound();
+        }
+        
+        allTasks.Remove(oneTask);
+        
         return Ok("Deleted");
     }
     
     [HttpPost]
-    public IActionResult Create()
+    public IActionResult Create([FromBody] ToDo toDo)
     {
-        return Ok("Deleted");
+        var allTasks = _tasksRepo.GetTasks();
+        allTasks.Add(toDo);
+        
+        return Ok(toDo);
     }
     
-    [HttpPost]
-    public IActionResult Update()
+    [HttpPost("{id:guid}")]
+    public IActionResult Update(Guid id, [FromBody] ToDo toDo)
     {
-        return Ok("Deleted");
+        var allTasks = _tasksRepo.GetTasks();
+        var oneTask = allTasks.FirstOrDefault(t => t.Id == id);
+        
+        if (oneTask == null)
+        {
+            return NotFound();
+        }
+
+        oneTask.Name = toDo.Name;
+        oneTask.IsComplete = toDo.IsComplete;
+        oneTask.DueDate = toDo.DueDate;
+        
+        return Ok(oneTask);
     }
 }

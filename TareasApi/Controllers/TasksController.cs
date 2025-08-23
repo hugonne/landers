@@ -6,26 +6,19 @@ namespace TareasApi.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
-public class TasksController : ControllerBase
+public class TasksController(ITasksRepo tasksRepo) : ControllerBase
 {
-    private readonly ITasksRepo _tasksRepo;
-
-    public TasksController(ITasksRepo tasksRepo)
-    {
-        _tasksRepo = tasksRepo;
-    }
-    
     [HttpGet]
     public IActionResult Get(bool all = false)
     {
-        return Ok(_tasksRepo.GetTasks());
+        var allTasks = tasksRepo.GetTasks(all);
+        return Ok(allTasks);
     }
     
     [HttpGet("{id:guid}")]
     public IActionResult GetById(Guid id)
     {
-        var allTasks = _tasksRepo.GetTasks();
-        var oneTask = allTasks.FirstOrDefault(t => t.Id == id);
+        var oneTask = tasksRepo.GetTaskById(id);
         
         if (oneTask == null)
         {
@@ -38,33 +31,21 @@ public class TasksController : ControllerBase
     [HttpDelete("{id:guid}")]
     public IActionResult Delete(Guid id)
     {
-        var allTasks = _tasksRepo.GetTasks();
-        var oneTask = allTasks.FirstOrDefault(t => t.Id == id);
-
-        if (oneTask == null)
-        {
-            return NotFound();
-        }
-        
-        allTasks.Remove(oneTask);
-        
+        tasksRepo.DeleteTaskById(id);
         return Ok("Deleted");
     }
     
     [HttpPost]
     public IActionResult Create([FromBody] ToDo toDo)
     {
-        var allTasks = _tasksRepo.GetTasks();
-        allTasks.Add(toDo);
-        
-        return Ok(toDo);
+        var id = tasksRepo.CreateTask(toDo);
+        return Ok(id);
     }
     
     [HttpPost("{id:guid}")]
     public IActionResult Update(Guid id, [FromBody] ToDo toDo)
     {
-        var allTasks = _tasksRepo.GetTasks();
-        var oneTask = allTasks.FirstOrDefault(t => t.Id == id);
+        var oneTask = tasksRepo.GetTaskById(id);
         
         if (oneTask == null)
         {
@@ -76,5 +57,14 @@ public class TasksController : ControllerBase
         oneTask.DueDate = toDo.DueDate;
         
         return Ok(oneTask);
+    }
+
+    public void Hola()
+    {
+        var step = new ToDoStep();
+        var toDoDueDate1 = step.ToDo.DueDate;
+
+        var todo = tasksRepo.GetTaskById(step.ToDoId);
+        var stepCount = todo.ToDoSteps.Count;
     }
 }

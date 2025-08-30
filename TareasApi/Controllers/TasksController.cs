@@ -32,6 +32,8 @@ public class TasksController(ITasksRepo tasksRepo) : ControllerBase
     public IActionResult Delete(Guid id)
     {
         tasksRepo.DeleteTaskById(id);
+        tasksRepo.SaveChanges();
+        
         return Ok("Deleted");
     }
     

@@ -1,50 +1,35 @@
-﻿using TareasApi.Domain;
+﻿using Microsoft.EntityFrameworkCore;
+using TareasApi.DataAccess;
+using TareasApi.Domain;
 
 namespace TareasApi.Repos;
 
-public class TasksRepo : ITasksRepo
+public class TasksRepo(ApplicationDbContext context) : ITasksRepo
 {
-    private readonly IList<ToDo> _toDos = new List<ToDo>
+    public IQueryable<ToDo> GetTasks(bool all = false)
     {
-        new()
+        if (all)
         {
-            Id = Guid.NewGuid(),
-            Name = "Tarea 1",
-            DueDate = DateTime.Now.AddDays(1),
-            IsComplete = false
-        },
-        new()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Tarea 2",
-            DueDate = DateTime.Now.AddDays(2),
-            IsComplete = false
-        },
-        new()
-        {
-            Id = Guid.NewGuid(),
-            Name = "Tarea 3",
-            DueDate = DateTime.Now.AddDays(3),
-            IsComplete = true
+            return context.ToDos.OrderBy(a => a.DueDate);
         }
-    };
-
-    public IList<ToDo> GetTasks(bool all = false)
-    {
-        return all ? _toDos.ToList() : _toDos
-            .Where(a => !a.IsComplete).ToList();
+        
+        return context.ToDos.Where(a => !a.IsComplete).OrderBy(a => a.DueDate);
     }
 
     public ToDo? GetTaskById(Guid id)
     {
-        return _toDos.FirstOrDefault(t => t.Id == id);
+        var x = context.ToDoSteps
+            .Include(a => a.ToDo)
+            .Where(a => a.ToDo.IsComplete && !a.IsComplete)
+            //.Select(a => a.ToDo)
+            .Distinct();
+        
+        return context.ToDos.FirstOrDefault(a => a.Id == id);
     }
 
     public Guid CreateTask(ToDo toDo)
     {
-        toDo.Id = Guid.NewGuid();
-        _toDos.Add(toDo);
-        return toDo.Id;
+        return context.ToDos.Add(toDo).Entity.Id;
     }
 
     public void DeleteTaskById(Guid id)
@@ -52,7 +37,12 @@ public class TasksRepo : ITasksRepo
         var toDo = GetTaskById(id);
         if (toDo != null)
         {
-            _toDos.Remove(toDo);
+            context.ToDos.Remove(toDo);
         }
+    }
+
+    public void SaveChanges()
+    {
+        context.SaveChanges();
     }
 }

@@ -24,7 +24,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 #region Application Services
 
-builder.Services.AddSingleton<ITasksRepo, TasksRepo>();
+builder.Services.AddTransient<ITasksRepo, TasksRepo>();
 
 #endregion
 

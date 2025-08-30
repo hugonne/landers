@@ -1,3 +1,5 @@
+using Microsoft.EntityFrameworkCore;
+using TareasApi.DataAccess;
 using TareasApi.Repos;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +9,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+#region Database Services
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlServerOptions =>
+        {
+            sqlServerOptions.CommandTimeout(60);
+        }));
+
+#endregion
 
 #region Application Services
 

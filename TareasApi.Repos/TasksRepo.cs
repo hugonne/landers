@@ -10,10 +10,14 @@ public class TasksRepo(ApplicationDbContext context) : ITasksRepo
     {
         if (all)
         {
-            return context.ToDos.OrderBy(a => a.DueDate);
+            return context.ToDos
+                .Include(a => a.ToDoSteps)
+                .OrderBy(a => a.DueDate);
         }
-        
-        return context.ToDos.Where(a => !a.IsComplete).OrderBy(a => a.DueDate);
+
+        return context.ToDos
+            .Include(a => a.ToDoSteps)
+            .Where(a => !a.IsComplete).OrderBy(a => a.DueDate);
     }
 
     public ToDo? GetTaskById(Guid id, bool includeSteps = false)
@@ -24,7 +28,7 @@ public class TasksRepo(ApplicationDbContext context) : ITasksRepo
                 .Include(a => a.ToDoSteps)
                 .FirstOrDefault(a => a.Id == id);
         }
-        
+
         return context.ToDos.Find(id);
     }
 
@@ -35,10 +39,24 @@ public class TasksRepo(ApplicationDbContext context) : ITasksRepo
 
     public void DeleteTaskById(Guid id)
     {
-        var toDo = GetTaskById(id);
+        var toDo = context.ToDos.Find(id);
         if (toDo != null)
         {
             context.ToDos.Remove(toDo);
+        }
+    }
+
+    public Guid CreateStep(ToDoStep toDoStep)
+    {
+        return context.ToDoSteps.Add(toDoStep).Entity.Id;
+    }
+
+    public void DeleteStepById(Guid id)
+    {
+        var toDoStep = context.ToDoSteps.Find(id);
+        if (toDoStep != null)
+        {
+            context.ToDoSteps.Remove(toDoStep);
         }
     }
 

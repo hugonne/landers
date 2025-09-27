@@ -34,13 +34,15 @@ public class TasksController(ITasksRepo tasksRepo) : ControllerBase
         tasksRepo.DeleteTaskById(id);
         tasksRepo.SaveChanges();
         
-        return Ok("Deleted");
+        return Ok();
     }
     
     [HttpPost]
     public IActionResult Create([FromBody] ToDo toDo)
     {
         var id = tasksRepo.CreateTask(toDo);
+        tasksRepo.SaveChanges();
+        
         return Ok(id);
     }
     
@@ -58,15 +60,8 @@ public class TasksController(ITasksRepo tasksRepo) : ControllerBase
         oneTask.IsComplete = toDo.IsComplete;
         oneTask.DueDate = toDo.DueDate;
         
+        tasksRepo.SaveChanges();
+        
         return Ok(oneTask);
-    }
-
-    public void Hola()
-    {
-        var step = new ToDoStep();
-        var toDoDueDate1 = step.ToDo.DueDate;
-
-        var todo = tasksRepo.GetTaskById(step.ToDoId);
-        var stepCount = todo.ToDoSteps.Count;
     }
 }

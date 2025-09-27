@@ -5,7 +5,7 @@ namespace TareasApi.Repos;
 public interface ITasksRepo
 {
     IQueryable<ToDo> GetTasks(bool all = false);
-    ToDo? GetTaskById(Guid id);
+    ToDo? GetTaskById(Guid id, bool includeSteps = false);
     Guid CreateTask(ToDo toDo);
     void DeleteTaskById(Guid id);
     void SaveChanges();

@@ -16,15 +16,16 @@ public class TasksRepo(ApplicationDbContext context) : ITasksRepo
         return context.ToDos.Where(a => !a.IsComplete).OrderBy(a => a.DueDate);
     }
 
-    public ToDo? GetTaskById(Guid id)
+    public ToDo? GetTaskById(Guid id, bool includeSteps = false)
     {
-        var x = context.ToDoSteps
-            .Include(a => a.ToDo)
-            .Where(a => a.ToDo.IsComplete && !a.IsComplete)
-            //.Select(a => a.ToDo)
-            .Distinct();
+        if (includeSteps)
+        {
+            return context.ToDos
+                .Include(a => a.ToDoSteps)
+                .FirstOrDefault(a => a.Id == id);
+        }
         
-        return context.ToDos.FirstOrDefault(a => a.Id == id);
+        return context.ToDos.Find(id);
     }
 
     public Guid CreateTask(ToDo toDo)

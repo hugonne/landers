@@ -10,6 +10,7 @@ public interface ITasksRepo
     ToDo? GetTaskById(Guid id, bool includeSteps = false);
     Guid CreateTask(ToDo toDo);
     void DeleteTaskById(Guid id);
+    void CompleteToDoById(Guid id);
     
     #endregion
     

@@ -113,4 +113,13 @@ public class ToDosController(ITasksRepo tasksRepo) : ControllerBase
         
         return Ok(toDoRequestDto);
     }
+    
+    [HttpPost("{id:guid}")]
+    public IActionResult Complete(Guid id)
+    {
+        tasksRepo.CompleteToDoById(id);
+        tasksRepo.SaveChanges();
+        
+        return Ok();
+    }
 }

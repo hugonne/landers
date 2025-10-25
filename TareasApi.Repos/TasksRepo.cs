@@ -15,6 +15,9 @@ public class TasksRepo(ApplicationDbContext context) : ITasksRepo
                 .OrderBy(a => a.DueDate);
         }
 
+        //var toDos = context.ToDoSteps.Include(s => s.ToDo).ThenInclude(t => t.ToDoSteps);
+        //var query = toDos.ToQueryString();
+        
         return context.ToDos
             .Include(a => a.ToDoSteps)
             .Where(a => !a.IsComplete).OrderBy(a => a.DueDate);
@@ -46,6 +49,22 @@ public class TasksRepo(ApplicationDbContext context) : ITasksRepo
         }
     }
 
+    public void CompleteToDoById(Guid id)
+    {
+        var toDo = context.ToDos.Include(a => a.ToDoSteps).FirstOrDefault(a => a.Id == id);
+
+        if (toDo == null)
+        {
+            return;
+        }
+        
+        toDo.IsComplete = true;
+        foreach (var toDoStep in toDo.ToDoSteps)
+        {
+            toDoStep.IsComplete = true;
+        }
+    }
+
     public Guid CreateStep(ToDoStep toDoStep)
     {
         return context.ToDoSteps.Add(toDoStep).Entity.Id;
@@ -68,14 +87,13 @@ public class TasksRepo(ApplicationDbContext context) : ITasksRepo
         {
             return;
         }
-        
+
         toDoStep.IsComplete = true;
-        
+
         var toDo = context.ToDos.Include(a => a.ToDoSteps).First(a => a.Id == toDoStep.ToDoId);
-        
+
         if (toDo.ToDoSteps.All(a => a.IsComplete))
         {
-            
             toDo.IsComplete = true;
         }
     }

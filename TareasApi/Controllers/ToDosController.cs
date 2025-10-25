@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TareasApi.Domain;
 using TareasApi.Dtos;
@@ -5,13 +6,18 @@ using TareasApi.Repos;
 
 namespace TareasApi.Controllers;
 
+
+
 [ApiController]
 [Route("[controller]/[action]")]
+[Authorize(Roles = "Admin")]
 public class ToDosController(ITasksRepo tasksRepo) : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get(bool all = false)
+    public async Task<IActionResult> Get(bool all = false)
     {
+        var user = User.Identity;
+        
         var allTasks = tasksRepo.GetTasks(all);
 
         var allTasksDto = allTasks.Select(a => new ToDoResponseDto
@@ -28,6 +34,8 @@ public class ToDosController(ITasksRepo tasksRepo) : ControllerBase
                 IsComplete = b.IsComplete
             })
         });
+        
+        await tasksRepo.SaveChangesAsync();
         
         return Ok(allTasksDto);
     }
@@ -61,6 +69,7 @@ public class ToDosController(ITasksRepo tasksRepo) : ControllerBase
     }
     
     [HttpDelete("{id:guid}")]
+    //[AllowAnonymous]
     public IActionResult Delete(Guid id)
     {
         tasksRepo.DeleteTaskById(id);

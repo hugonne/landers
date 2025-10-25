@@ -8,7 +8,7 @@ public interface ITasksRepo
     
     IQueryable<ToDo> GetTasks(bool all = false);
     ToDo? GetTaskById(Guid id, bool includeSteps = false);
-    Guid CreateTask(ToDo toDo);
+    Task<Guid> CreateTask(ToDo toDo);
     void DeleteTaskById(Guid id);
     void CompleteToDoById(Guid id);
     
@@ -23,4 +23,5 @@ public interface ITasksRepo
     #endregion
 
     void SaveChanges();
+    Task SaveChangesAsync();
 }

@@ -35,9 +35,9 @@ public class TasksRepo(ApplicationDbContext context) : ITasksRepo
         return context.ToDos.Find(id);
     }
 
-    public Guid CreateTask(ToDo toDo)
+    public async Task<Guid> CreateTask(ToDo toDo)
     {
-        return context.ToDos.Add(toDo).Entity.Id;
+        return context.ToDos.AddAsync(toDo).Result.Entity.Id;
     }
 
     public void DeleteTaskById(Guid id)
@@ -101,5 +101,10 @@ public class TasksRepo(ApplicationDbContext context) : ITasksRepo
     public void SaveChanges()
     {
         context.SaveChanges();
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await context.SaveChangesAsync();
     }
 }

@@ -17,6 +17,7 @@ public interface ITasksRepo
     
     Guid CreateStep(ToDoStep toDoStep);
     void DeleteStepById(Guid id);
+    void CompleteStepById(Guid id);
     
     #endregion
 

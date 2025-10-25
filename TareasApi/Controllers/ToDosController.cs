@@ -7,7 +7,7 @@ namespace TareasApi.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
-public class TasksController(ITasksRepo tasksRepo) : ControllerBase
+public class ToDosController(ITasksRepo tasksRepo) : ControllerBase
 {
     [HttpGet]
     public IActionResult Get(bool all = false)

@@ -6,7 +6,7 @@ namespace TareasApi.Controllers;
 
 [ApiController]
 [Route("[controller]/[action]")]
-public class TaskStepsController(ITasksRepo tasksRepo) : ControllerBase
+public class ToDoStepsController(ITasksRepo tasksRepo) : ControllerBase
 {
     [HttpPost]
     public IActionResult Create([FromBody] ToDoStep toDoStep)
@@ -28,6 +28,15 @@ public class TaskStepsController(ITasksRepo tasksRepo) : ControllerBase
     public IActionResult Delete(Guid id)
     {
         tasksRepo.DeleteStepById(id);
+        tasksRepo.SaveChanges();
+        
+        return Ok();
+    }
+
+    [HttpPost("{id:guid}")]
+    public IActionResult Complete(Guid id)
+    {
+        tasksRepo.CompleteStepById(id);
         tasksRepo.SaveChanges();
         
         return Ok();

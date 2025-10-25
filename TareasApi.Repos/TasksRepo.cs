@@ -60,6 +60,26 @@ public class TasksRepo(ApplicationDbContext context) : ITasksRepo
         }
     }
 
+    public void CompleteStepById(Guid id)
+    {
+        var toDoStep = context.ToDoSteps.Find(id);
+
+        if (toDoStep == null)
+        {
+            return;
+        }
+        
+        toDoStep.IsComplete = true;
+        
+        var toDo = context.ToDos.Include(a => a.ToDoSteps).First(a => a.Id == toDoStep.ToDoId);
+        
+        if (toDo.ToDoSteps.All(a => a.IsComplete))
+        {
+            
+            toDo.IsComplete = true;
+        }
+    }
+
     public void SaveChanges()
     {
         context.SaveChanges();
